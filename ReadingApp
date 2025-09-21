@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kids Reading Tracker</title>
+    <style>
+      body {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f8ff;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        position: relative; /* Added to position the logo relative to this container */
+      }
+      .header-logo {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        width: 120px; /* You can adjust the size */
+        height: auto;
+      }
+      h1,
+      h2 {
+        color: #4169e1;
+        text-align: center;
+      }
+      .student-info,
+      .age-selector,
+      .passage-selector {
+        margin: 20px 0;
+        text-align: center;
+      }
+      input,
+      select,
+      button {
+        padding: 8px 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 2px solid #4169e1;
+        background-color: white;
+        margin: 5px;
+        font-family: inherit;
+      }
+      .form-group {
+        margin: 10px 0;
+      }
+      label {
+        display: inline-block;
+        width: 100px;
+        text-align: right;
+        margin-right: 10px;
+      }
+      button {
+        background-color: #4169e1;
+        color: white;
+        margin: 10px 5px;
+        transition: background-color 0.3s;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #1e40af;
+      }
+      #reading-area,
+      #mcq-area,
+      #results-area {
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px solid #ccc;
+        display: none;
+      }
+      #reading-text {
+        font-size: 18px;
+        line-height: 1.6;
+        text-align: justify;
+      }
+      .mcq-question {
+        margin-bottom: 15px;
+        font-weight: bold;
+      }
+      .mcq-options {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .option {
+        margin: 5px 0;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+      }
+      .option:hover {
+        background-color: #e6f0ff;
+      }
+      .selected {
+        background-color: #d1e0ff;
+      }
+      #timer {
+        font-size: 24px;
+        text-align: center;
+        margin: 15px 0;
+        font-weight: bold;
+        color: #4169e1;
+      }
+      #results-area {
+        background-color: #f0fff0;
+      }
+      .result-item {
+        margin: 10px 0;
+        font-size: 18px;
+      }
+      .animation {
+        text-align: center;
+        font-size: 24px;
+        margin: 20px 0;
+        color: #4169e1;
+      }
+      .correct {
+        color: green;
+      }
+      .incorrect {
+        color: red;
+      }
+      #admin-panel {
+        margin-top: 20px;
+        text-align: center;
+        display: none;
+      }
+      .hidden-password {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        opacity: 0.3; /* Change from 0 to 0.3 for subtle visibility */
+        cursor: pointer;
+        font-size: 12px;
+        color: #666;
+        background-color: #f0f8ff;
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+
+      .hidden-password:hover {
+        opacity: 0.7; /* Make it more visible on hover */
+      }
+
+      /* Footer Style */
+      .app-footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #333;
+        font-family: Arial, sans-serif; /* Using a more standard font for the footer */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Logo Added Here -->
+      <img
+        src="Transparent_Logo_Giftolexia_Regular 2.png"
+        alt="Giftolexia Logo"
+        class="header-logo"
+      />
+
+      <h1>🌟 Kids Reading Adventure 🌟</h1>
+
+      <div id="student-info" class="student-info">
+        <h2>Student Information</h2>
+
+        <div class="form-group">
+          <label for="student-name">Name:</label>
+          <input type="text" id="student-name" placeholder="Enter your name" />
+        </div>
+
+        <div class="form-group">
+          <label for="student-age">Age:</label>
+          <input
+            type="number"
+            id="student-age"
+            min="6"
+            placeholder="Enter your age"
+          />
+        </div>
+        <div class="form-group">
+          <label for="student-class">Class:</label>
+          <input
+            type="text"
+            id="student-class"
+            placeholder="Enter your class"
+          />
+        </div>
+        <div class="form-group">
+          <label for="student-school">School:</label>
+          <input
+            type="text"
+            id="student-school"
+            placeholder="Enter your school name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="student-city">City:</label>
+          <input type="text" id="student-city" placeholder="Enter your city" />
+        </div>
+        <button id="submit-info">Start Adventure!</button>
+      </div>
+
+      <div class="age-selector" style="display: none">
+        <h2>Choose Your Age Group:</h2>
+        <select id="age-select">
+          <option value="">Select your age</option>
+          <option value="6">6 years</option>
+          <option value="7">7 years</option>
+          <option value="8">8 years</option>
+          <option value="9">9 years</option>
+          <option value="10">10 years</option>
+        </select>
+      </div>
+
+      <div class="passage-selector" style="display: none">
+        <h2>Choose a Reading Passage:</h2>
+        <select id="passage-select">
+          <option value="">Select a passage</option>
+        </select>
+        <div>
+          <button id="start-reading">Start Reading!</button>
+        </div>
+      </div>
+
+      <div id="reading-area">
+        <div id="timer">00:00</div>
+        <div id="reading-text"></div>
+        <button id="start-time" style="margin-left: 10%; margin-top: 10%">
+          Start
+        </button>
+        <button id="finish-reading" style="margin-left: 55%; margin-top: 10%">
+          Submit
+        </button>
+      </div>
+
+      <div id="mcq-area">
+        <h2>Answer These Questions:</h2>
+        <div id="mcq-questions"></div>
+
+        <div
+          class="feedback-selector"
+          style="text-align: center; margin-top: 30px"
+        >
+          <h2>Child Performance Feedback</h2>
+          <select id="feedback-select">
+            <option value="">Select appropriate feedback</option>
+            <option value="Excellent">Student read very well</option>
+            <option value="Good">
+              Student could read but made few mistakes
+            </option>
+            <option value="Average">
+              Student could read but made more than 8 mistakes
+            </option>
+            <option value="Couldn't read">Student could not read</option>
+          </select>
+        </div>
+
+        <button id="submit-answers" style="margin-left: 40%; margin-top: 50px">
+          Submit My Answers!
+        </button>
+      </div>
+
+      <div id="results-area">
+        <h2>Your Results:</h2>
+        <div class="animation">🎉</div>
+        <div id="results-content"></div>
+        <!-- MODIFICATION START: Removed the display for Reading Speed and Accuracy -->
+        <!-- 
+        <div class="result-item">
+          <strong>Reading Speed:</strong> <span id="reading-speed"></span> words
+          per minute
+        </div>
+        <div class="result-item">
+          <strong>Accuracy:</strong> <span id="accuracy"></span>% correct
+        </div>
+         -->
+        <!-- MODIFICATION END -->
+        <button id="try-another" style="margin-left: 40%">
+          Try Another Passage!
+        </button>
+      </div>
+
+      <!-- Admin Panel (modified to include Clear Data button) -->
+      <div id="admin-panel">
+        <h2>Test Administrator Panel</h2>
+        <button id="export-data">Export Student Data (Excel)</button>
+        <button id="clear-data">Clear Data</button>
+        <div
+          id="data-preview"
+          style="margin-top: 20px; max-height: 300px; overflow-y: auto"
+        ></div>
+      </div>
+      <!-- Footer Added Here -->
+      <div class="app-footer">@Giftolexia</div>
+    </div>
+    <!-- Container div ends here -->
+
+    <!-- Hidden element to trigger admin panel -->
+    <div class="hidden-password" id="admin-trigger">Admin Access</div>
+
+    <script>
+      // Reading passages would be inserted here from the original code
+      const readingData = {
+        6: [
+          {
+            id: "6-1",
+            title: "The Lost Ball",
+            text: `Sam had a red ball. He loved to play with it every day. One day, the ball went far away. Sam looked here and there, but he did not find the ball. He felt very sad.
+Then he saw a dog with his ball! The dog was nice. It gave the ball back to Sam. Sam was very happy. He said "Thank you" to the dog. Now they are best pals.
+`,
+            questions: [
+              {
+                question: "What color was Sam's ball?",
+                options: ["Blue", "Red", "Green", "Yellow"],
+                correctAnswer: 1, // Red is at index 1
+              },
+              {
+                question: "What happened to Sam's ball?",
+                options: [
+                  "It rolled under the bed",
+                  "A cat took it",
+                  "It popped",
+                  "It went far away",
+                ],
+                correctAnswer: 3, // "It went far away" is at index 3
+              },
+              {
+                question: "Who gave the ball back to Sam?",
+                options: ["His mom", "A dog", "His friend", "A cat"],
+                correctAnswer: 1, // "A dog" is at index 1
+              },
+              {
+                question: "What did Sam say to the dog?",
+                options: ["Go away!", "Good boy!", "Thank you!", "Let's play!"],
+                correctAnswer: 2, // "Thank you!" is at index 2
+              },
+              {
+                question: "What happened between Sam and the dog after that?",
+                options: [
+                  "They argued",
+                  "They became best friends",
+                  "The dog kept the ball",
+                  "Sam found a new ball",
+                ],
+                correctAnswer: 1, // "They became best friends" is at index 1
+              },
+            ],
+          },
+          {
+            id: "6-2",
+            title: "The Hungry Cat",
+            text: `Lily saw a thin cat near her home. The cat looked very sad and hungry. Lily felt bad for the cat. She got some milk and rice from her mom.
+The cat ate all the food. It felt much happy now. The cat said "meow" to thank Lily. From that day, the cat came to Lily's home every day. Lily loved her new pet cat.
+
+`,
+            questions: [
+              {
+                question: "What animal did Lily see?",
+                options: ["A dog", "A bird", "A fish", "A cat"],
+                correctAnswer: 3, // "A cat" is at index 3
+              },
+              {
+                question: "How did the cat look when Lily first saw it?",
+                options: [
+                  "Fat and happy",
+                  "Thin and sad",
+                  "Playful and energetic",
+                  "Big and scary",
+                ],
+                correctAnswer: 1, // "Thin and sad" is at index 1
+              },
+              {
+                question: "What did Lily give the cat to eat?",
+                options: [
+                  "Fish and bread",
+                  "Milk and rice",
+                  "Water and kibble",
+                  "Meat and cheese",
+                ],
+                correctAnswer: 1, // "Milk and rice" is at index 1
+              },
+              {
+                question: "What sound did the cat make to thank Lily?",
+                options: ["Woof", "Meow", "Chirp", "Hiss"],
+                correctAnswer: 1, // "Meow" is at index 1
+              },
+              {
+                question: "What happened from that day forward?",
+                options: [
+                  "The cat ran away",
+                  "Lily ignored the cat",
+                  "The cat came to Lily's home every day",
+                  "Lily found a new pet",
+                ],
+                correctAnswer: 2, // "The cat came to Lily's home every day" is at index 2
+              },
+            ],
+          },
+          {
+            id: "6-3",
+            title: "The Good Pup",
+            text: `Sam got a new pup. The pup was tan with a dot on its back. "Let us go for a walk," Sam said. The pup ran fast and made Sam run too. They went past a lake. They went past a hill. The pup had so much fun! When they got home, the pup was very tired. It sat by Sam and put its head down. "You are a good pup," Sam said. "We will go out to play each day."`,
+            questions: [
+              {
+                question: "What kind of pet did Sam get?",
+                options: ["A fish", "A bird", "A cat", "A pup"],
+                correctAnswer: 3, // A pup is at index 3
+              },
+              {
+                question: "What color was the pup?",
+                options: ["Black", "Tan", "White", "Grey"],
+                correctAnswer: 1, // Tan is at index 1
+              },
+              {
+                question: "Where did Sam and the pup go?",
+                options: [
+                  "To the park",
+                  "To the mall",
+                  "Past a lake and a hill",
+                  "To school",
+                ],
+                correctAnswer: 2, // Past a lake and a hill is at index 2
+              },
+              {
+                question: "What did the pup do after the walk?",
+                options: [
+                  "Ate food",
+                  "Ran around more",
+                  "Went to sleep",
+                  "Sat by Sam",
+                ],
+                correctAnswer: 3, // Sat by Sam is at index 3
+              },
+              {
+                question: "What did Sam say to the pup?",
+                options: [
+                  "You are too fast",
+                  "You are a good pup",
+                  "Stop running!",
+                  "Let's go inside",
+                ],
+                correctAnswer: 1, // "You are a good pup" is at index 1
+              },
+            ],
+          },
+        ],
+        7: [
+          {
+            id: "7-1",
+            title: "The Brave Ship",
+            text: `Max had a small boat made from wood. He loved  his toy boat. One day, Max took his boat to the lake. "Today you will have a great big trip," Max told his boat. The wind blew hard and the boat sailed fast. It went far from the shore! Max could not reach it. Just then, Liam came by with his boat. "Hop in," Liam said. "We can catch your boat." They rowed and rowed until they found the small wooden boat. Max was so happy! "Thank you for your help," Max said to Liam. "Would you like to play with my boat too?" The boys spent the whole day at the lake with their boats.`,
+            questions: [
+              {
+                question: "What was Max's ship made of?",
+                options: ["Plastic", "Wood", "Paper", "Glass"],
+                correctAnswer: 1, // Wood is at index 1
+              },
+              {
+                question: "Where did Max take his ship?",
+                options: [
+                  "To a park",
+                  "To the sea",
+                  "To the lake",
+                  "To the pool",
+                ],
+                correctAnswer: 2, // To the lake is at index 2
+              },
+              {
+                question: "Who helped Max get his ship back?",
+                options: ["His dad", "A dog", "Liam", "His sister"],
+                correctAnswer: 2, // Liam is at index 2
+              },
+              {
+                question: "How did they catch the ship?",
+                options: [
+                  "With a rope",
+                  "By swimming",
+                  "With a net",
+                  "In a boat",
+                ],
+                correctAnswer: 3, // In a boat is at index 3
+              },
+              {
+                question: "What did Max do after getting his ship back?",
+                options: [
+                  "Took it home",
+                  "Played with Liam",
+                  "Cried",
+                  "Gave it away",
+                ],
+                correctAnswer: 1, // Played with Liam is at index 1
+              },
+            ],
+          },
+          {
+            id: "7-2",
+            title: "The Hidden Frog",
+            text: `Nita found a green frog in her yard. It had spots and big round eyes.
+      "Hello, frog," said Nita. "Would you like to be my friend?"
+      The frog was scared and  hid under a rock. Nita searched for the frog  but could not find the frog.
+      She sat down and waited. After a while, the frog poked its head out.
+      "I will not hurt you," Nita said in a soft voice. "I just want to watch you."
+      The frog hopped back into view. It seemed to smile at Nita!
+      Every day after that, Nita would sit in her yard and wait. The frog would come out to visit her.`,
+            questions: [
+              {
+                question: "What did Nita find in her yard?",
+                options: ["A bunny", "A frog", "A cat", "A turtle"],
+                correctAnswer: 1, // A frog is at index 1
+              },
+              {
+                question: "What did the frog do when Nita spoke to it?",
+                options: ["It ran", "It jumped on her", "It hid", "It sang"],
+                correctAnswer: 2, // It hid is at index 2
+              },
+              {
+                question: "Where did the frog hide?",
+                options: [
+                  "In a pond",
+                  "In the grass",
+                  "In a tree",
+                  "Under a rock",
+                ],
+                correctAnswer: 3, // Under a rock is at index 3
+              },
+              {
+                question: "What did Nita do to make the frog come back?",
+                options: [
+                  "She sang a song",
+                  "She gave it food",
+                  "She shouted",
+                  "She sat and waited",
+                ],
+                correctAnswer: 3, // She sat and waited is at index 3
+              },
+              {
+                question: "What did Nita do every day after that?",
+                options: [
+                  "Played with the frog",
+                  "Caught the frog",
+                  "Waited for the frog",
+                  "Gave the frog a name",
+                ],
+                correctAnswer: 2, // Waited for the frog is at index 2
+              },
+            ],
+          },
+          {
+            id: "7-3",
+            title: "The Magic Seed",
+            text: `Nita found a green frog in her yard. It had spots and big round eyes.
+      "Hello, frog," said Nita. "Would you like to be my friend?"
+      The frog was scared and  hid under a rock. Nita searched for the frog  but could not find the frog.
+      She sat down and waited. After a while, the frog poked its head out.
+      "I will not hurt you," Nita said in a soft voice. "I just want to watch you."
+      The frog hopped back into view. It seemed to smile at Nita!
+      Every day after that, Nita would sit in her yard and wait. The frog would come out to visit her.`,
+            questions: [
+              {
+                question: "Who gave Adit the seed?",
+                options: ["His friend", "His mom", "His nana", "His teacher"],
+                correctAnswer: 2, // His nana is at index 2
+              },
+              {
+                question: "What did Adit do with the seed?",
+                options: [
+                  "He ate it",
+                  "He threw it",
+                  "He planted it",
+                  "He painted it",
+                ],
+                correctAnswer: 2, // He planted it is at index 2
+              },
+              {
+                question: "What did Adit say to the seed every day?",
+                options: [
+                  "Please sing!",
+                  "Grow, little seed",
+                  "Go away!",
+                  "Wake up!",
+                ],
+                correctAnswer: 1, // "Grow, little seed" is at index 1
+              },
+              {
+                question: "What grew from the seed?",
+                options: ["A tree", "A red flower", "A vegetable", "A bush"],
+                correctAnswer: 1, // A red flower is at index 1
+              },
+              {
+                question: "What did Nana say was the real magic?",
+                options: ["The flower", "The seed", "The soil", "Adit's care"],
+                correctAnswer: 3, // Adit's care is at index 3
+              },
+            ],
+          },
+        ],
+        8: [
+          {
+            id: "8-1",
+            title: "The Tree Fort",
+            text: `Mia and Ben found a big oak tree in the park. "This would be a great spot for a fort," said Mia. They gathered sticks and old boards from home. Ben brought rope and Mia found a small tarp.
+      First, they tied boards between two strong branches. Then they made walls with the sticks. The tarp became their roof. " We need a sign for our fort," Ben said. Mia painted a sign that said, "Ben and Mia’s Place." They hung it at the entrance.
+      Every day after school, they met at their fort. They read books, drew pictures, and watched birds. It was their special spot where they could talk and plan adventures.`,
+            questions: [
+              {
+                question: "Where did Mia and Ben decide to build their fort?",
+                options: [
+                  "In their backyard",
+                  "At school",
+                  "In a big oak tree in the park",
+                  "In Mia's house",
+                ],
+                correctAnswer: 2, // In a big oak tree in the park is at index 2
+              },
+              {
+                question: "What did they use as the roof for the fort?",
+                options: ["Wooden boards", "A blanket", "A tarp", "Leaves"],
+                correctAnswer: 2, // A tarp is at index 2
+              },
+              {
+                question: "What did Mia paint for the fort?",
+                options: [
+                  "A picture of a bird",
+                  "A sign that said 'Mia and Ben's Place'",
+                  "A map of the park",
+                  "A picture of the tree",
+                ],
+                correctAnswer: 1, // A sign that said 'Mia and Ben's Place' is at index 1
+              },
+              {
+                question: "What did Mia and Ben do at their fort?",
+                options: [
+                  "Played video games",
+                  "Took naps",
+                  "Read books, drew pictures, and watched birds",
+                  "Built another fort",
+                ],
+                correctAnswer: 2, // Read books, drew pictures, and watched birds is at index 2
+              },
+              {
+                question: "Why was the fort special to Mia and Ben?",
+                options: [
+                  "It was a secret",
+                  "They built it with their teacher",
+                  "It was their spot to talk and plan adventures",
+                  "It had a TV inside",
+                ],
+                correctAnswer: 2, // It was their spot to talk and plan adventures is at index 2
+              },
+            ],
+          },
+          {
+            id: "8-2",
+            title: "The Lost Puppy",
+            text: `Sam was walking home when he heard a small cry. He saw a tiny brown puppy behind a bush. "Are you lost?" Sam asked. The puppy wagged its tail.
+      Sam looked around but saw no one searching for a pet. He gently picked up the puppy and carried it home. "Mom, look what I found!" Sam called. His mom helped him make signs with a picture of the puppy. They put the sign all around their block.
+      The next day a girl named Lily called them. Her puppy had dug under the fence and run off. Lily was so happy to see her puppy. "Thank you for taking care of Max," she said.
+      Sam felt very happy that he was able to help to help Lily find her lost puppy.`,
+            questions: [
+              {
+                question: "What did Sam find behind the bush?",
+                options: ["A kitten", "A lost puppy", "A bird", "A toy"],
+                correctAnswer: 1, // A lost puppy is at index 1
+              },
+              {
+                question:
+                  "What did Sam and his mom do to find the puppy's owner?",
+                options: [
+                  "Posted on the internet",
+                  "Called the police",
+                  "Made signs with a picture of the puppy",
+                  "Went door to door",
+                ],
+                correctAnswer: 2, // Made signs with a picture of the puppy is at index 2
+              },
+              {
+                question: "What was the name of the puppy's owner?",
+                options: ["Mia", "Ben", "Lily", "Emma"],
+                correctAnswer: 2, // Lily is at index 2
+              },
+              {
+                question: "How did Lily feel when she got her puppy back?",
+                options: ["Sad", "Angry", "Happy", "Scared"],
+                correctAnswer: 2, // Happy is at index 2
+              },
+              {
+                question: "What was the puppy's name?",
+                options: ["Rocky", "Buddy", "Max", "Charlie"],
+                correctAnswer: 2, // Max is at index 2
+              },
+            ],
+          },
+          {
+            id: "8-3",
+            title: "The Garden Contest",
+            text: `Josh’s  teacher gave each student five seeds to plant. He wanted to grow the best garden in his class.  "Take good care of them," the teacher said. 
+Josh put his seeds in a small pot with soil. He placed it by the window where it would get lots of sun. Every day, he talked to the plants as he watered them. He would tell the plants "Grow tall and strong."
+For many days nothing seemed to happen. But Josh did not give up. After a few weeks Josh's plants started to grow. In six weeks the plants had grown tall and it had bright yellow flowers. They were not the tallest plants , but they had the most number of flowers.
+Josh won the award for "The Most Colourful Garden." He was proud of his yellow flowers and all the work he had done. "Your plants look very healthy," his teacher said. "You must have taken very good care of them." `,
+            questions: [
+              {
+                question: "What did each student get from the teacher?",
+                options: ["A flower", "Five seeds", "A pot", "A watering can"],
+                correctAnswer: 1, // Five seeds is at index 1
+              },
+              {
+                question: "Where did Josh place his pot?",
+                options: [
+                  "In the shade",
+                  "In the classroom",
+                  "In the garden",
+                  "By the window",
+                ],
+                correctAnswer: 3, // By the window is at index 3
+              },
+              {
+                question: "What did Josh say to his plants?",
+                options: [
+                  "Good night!",
+                  "Grow tall and strong",
+                  "Be the best",
+                  "Bloom now!",
+                ],
+                correctAnswer: 1, // "Grow tall and strong" is at index 1
+              },
+              {
+                question: "How did Josh feel when nothing seemed to happen?",
+                options: [
+                  "He gave up",
+                  "He got angry",
+                  "He kept caring for the plants",
+                  "He changed the pot",
+                ],
+                correctAnswer: 2, // He kept caring for the plants is at index 2
+              },
+              {
+                question: "What award did Josh win?",
+                options: [
+                  "Tallest Plant",
+                  "Fastest Growing",
+                  "Most Colourful Garden",
+                  "Best Pot Design",
+                ],
+                correctAnswer: 2, // Most Colourful Garden is at index 2
+              },
+            ],
+          },
+        ],
+        9: [
+          {
+            id: "9-1",
+            title: "The Secret Clubhouse",
+            text: `Jack and Maya found an old tree with branches that hung low to the ground. They looked at each other with the same thought: this would make the perfect clubhouse.
+"We can use these branches and some old sheets," Jack suggested.
+"And I have some rope at home that we can use," Maya added.
+For three days, they worked after school. They tied branches together to make walls and draped sheets over the top. Inside, they placed a small wooden box for treasures and two cushions they brought from home.
+"What should we call our club?" Jack asked.
+"The Forest Explorers," Maya decided after thinking hard.
+That summer, they met in their secret clubhouse every day. They drew maps of the neighbourhood, collected interesting rocks, and planned adventures. It became their special place where ideas grew as quickly as the leaves on their tree.`,
+            questions: [
+              {
+                question:
+                  "What did Jack and Maya use to build their clubhouse?",
+                options: [
+                  "Bricks and cement",
+                  "Wooden planks and nails",
+                  "Fallen branches, old sheets, and rope",
+                  "Plastic and paint",
+                ],
+                correctAnswer: 2, // Fallen branches, old sheets, and rope is at index 2
+              },
+              {
+                question: "What did they place inside the clubhouse?",
+                options: [
+                  "A lamp and books",
+                  "A small wooden box and two cushions",
+                  "A table and chairs",
+                  "A map and a flashlight",
+                ],
+                correctAnswer: 1, // A small wooden box and two cushions is at index 1
+              },
+              {
+                question: "What name did Maya choose for their club?",
+                options: [
+                  "Treehouse Heroes",
+                  "The Forest Explorers",
+                  "Adventure Seekers",
+                  "Secret Friends",
+                ],
+                correctAnswer: 1, // The Forest Explorers is at index 1
+              },
+              {
+                question: "What kind of things did they do in the clubhouse?",
+                options: [
+                  "Played video games",
+                  "Watched TV",
+                  "Drew maps, collected rocks, and planned adventures",
+                  "Wrote stories about animals",
+                ],
+                correctAnswer: 2, // Drew maps, collected rocks, and planned adventures is at index 2
+              },
+              {
+                question: "Why was the clubhouse special to Jack and Maya?",
+                options: [
+                  "It was big and colorful",
+                  "They had snacks inside",
+                  "It was their own secret place to share ideas and have fun",
+                  "They used it for school homework",
+                ],
+                correctAnswer: 2, // It was their own secret place to share ideas and have fun is at index 2
+              },
+            ],
+          },
+          {
+            id: "9-2",
+            title: "The Mystery of the Missing Bicycle",
+            text: `Carl rushed outside one morning to ride his bicycle to school, but he could not find it . He searched the yard, the garage, and even looked up and down the street.
+"Mom!" he called. "My bicycle is gone!"
+His mother helped him look, but they could not find it anywhere. Carl had to walk to school that day, wondering who might have taken his blue bicycle with the silver bell.
+During lunch, his friend Sarah mentioned something strange.
+"I saw your little brother wheeling a bicycle into the woods yesterday," she said.
+Carl hurried home after school and followed the path into the woods behind his house. There, deep among the trees, he found his four-year-old brother sitting proudly next to the bicycle, which was now decorated with leaves and twigs.
+"I made it pretty for you," his brother said with a smile.
+Carl could not even be angry. "Next time, you please ask me before taking my bike," he said. Then he wheeled his bicycle back home.
+`,
+            questions: [
+              {
+                question: "What did Carl notice was missing in the morning?",
+                options: [
+                  "His backpack",
+                  "His lunch",
+                  "His bicycle",
+                  "His homework",
+                ],
+                correctAnswer: 2, // His bicycle is at index 2
+              },
+              {
+                question:
+                  "Where did Carl's friend Sarah say she saw his bicycle?",
+                options: [
+                  "In front of the school",
+                  "In the garage",
+                  "Near the pond",
+                  "Being wheeled into the woods",
+                ],
+                correctAnswer: 3, // Being wheeled into the woods is at index 3
+              },
+              {
+                question: "Who had taken Carl's bicycle?",
+                options: [
+                  "A stranger",
+                  "His neighbor",
+                  "His little brother",
+                  "His cousin",
+                ],
+                correctAnswer: 2, // His little brother is at index 2
+              },
+              {
+                question: "What had Carl's brother done to the bicycle?",
+                options: [
+                  "Painted it red",
+                  "Taken off the wheels",
+                  "Decorated it with leaves and twigs",
+                  "Given it away",
+                ],
+                correctAnswer: 2, // Decorated it with leaves and twigs is at index 2
+              },
+              {
+                question:
+                  "How did Carl react when he found his brother with the bicycle?",
+                options: [
+                  "He got very angry",
+                  "He laughed and asked him to ask next time",
+                  "He took the bicycle without saying anything",
+                  "He told his mom to punish him",
+                ],
+                correctAnswer: 1, // He laughed and asked him to ask next time is at index 1
+              },
+            ],
+          },
+          {
+            id: "9-3",
+            title: "The Science Project",
+            text: `Emma was participating in her school science fair. She wanted to pick an interesting project.
+"Plants are interesting," her father suggested. "Why not study how they grow?"
+Emma decided to test if music helped plants grow better. She placed three small plants in different rooms. One of the plants was exposed to  classical music, another to rock music and she did not play any music for the third plant. 
+Every day for three weeks, Emma measured each plant and wrote down her findings in a notebook. She watered them every day and made sure they all got equal amount of sunlight.
+When the science fair arrived, Emma was ready with her display board showing charts and photos. To her surprise, the plant that was exposed to classical music had grown the tallest! "Music does affect plant growth," she explained to the judges. 
+Emma won the second place. She was proud of her work and excited to try a new experiment next year.
+`,
+            questions: [
+              {
+                question: "What was Emma's science project about?",
+                options: [
+                  "How magnets work",
+                  "How plants grow with different types of music",
+                  "Building a robot",
+                  "Making a volcano",
+                ],
+                correctAnswer: 1, // How plants grow with different types of music is at index 1
+              },
+              {
+                question: "How many plants did Emma use for her experiment?",
+                options: ["One", "Two", "Three", "Four"],
+                correctAnswer: 2, // Three is at index 2
+              },
+              {
+                question:
+                  "Which type of music helped the plant grow the tallest?",
+                options: [
+                  "Rock music",
+                  "No music at all",
+                  "Pop music",
+                  "Classical music",
+                ],
+                correctAnswer: 3, // Classical music is at index 3
+              },
+              {
+                question: "What did Emma do every day during the experiment?",
+                options: [
+                  "Changed the soil",
+                  "Moved the plants to different rooms",
+                  "Measured the plants and wrote notes",
+                  "Played music at night only",
+                ],
+                correctAnswer: 2, // Measured the plants and wrote notes is at index 2
+              },
+              {
+                question: "What place did Emma win at the science fair?",
+                options: ["First", "Second", "Third", "Did not win"],
+                correctAnswer: 1, // Second is at index 1
+              },
+            ],
+          },
+        ],
+        10: [
+          {
+            id: "10-1",
+            title: "The Science Camp Adventure",
+            text: `Alex had never been away from home for a whole week before. Now here she was, boarding the bus for science camp in the mountains.
+"You'll have a great time," her mom promised. "And you can call us every evening."
+At camp, Alex was assigned to Cabin Pine with four other kids. Their counsellor, Jessie, had bright blue hair and knew everything about stars.
+The first day was tough. Alex missed home and felt too shy to talk much. But on the second day, during the robotics workshop, she helped her team build a robot that could follow a line across the floor.
+"That was smart programming," said her cabinmate Theo. "Where did you learn to do that?"
+Soon Alex was enjoying the daily activities: building miniature volcanoes, tracking wildlife in the forest, and learning about weather patterns. At night, Jessie showed them constellations through a powerful telescope.
+By the end of the week, Alex had forgotten she was ever homesick. When her parents came to pick her up, she could not stop talking about all her adventures.
+"Can I come back next summer?" she asked.
+Her parents smiled. "Of course you can."
+`,
+            questions: [
+              {
+                question:
+                  "Why was Alex nervous at the beginning of science camp?",
+                options: [
+                  "She had never been camping before.",
+                  "She didn't bring enough clothes.",
+                  "She missed home and felt shy around others.",
+                  "She didn't like science.",
+                ],
+                correctAnswer: 2, // She missed home and felt shy around others is at index 2
+              },
+              {
+                question: "What helped Alex start to enjoy camp?",
+                options: [
+                  "She got to go home early.",
+                  "She had her own cabin.",
+                  "She built a robot with her team and received a compliment.",
+                  "She spent all day reading books.",
+                ],
+                correctAnswer: 2, // She built a robot with her team and received a compliment is at index 2
+              },
+              {
+                question:
+                  "What activity did Jessie, the counselor, lead at night?",
+                options: [
+                  "Campfire songs",
+                  "Telescope stargazing and constellation viewing",
+                  "Storytelling",
+                  "Robot races",
+                ],
+                correctAnswer: 1, // Telescope stargazing and constellation viewing is at index 1
+              },
+              {
+                question:
+                  "By the end of the week, how did Alex feel about camp?",
+                options: [
+                  "She still wanted to go home.",
+                  "She was bored of the activities.",
+                  "She loved it and wanted to return next summer.",
+                  "She didn't talk much about it.",
+                ],
+                correctAnswer: 2, // She loved it and wanted to return next summer is at index 2
+              },
+              {
+                question:
+                  "Which of these was NOT an activity Alex did at camp?",
+                options: [
+                  "Tracking wildlife",
+                  "Playing video games",
+                  "Building volcanoes",
+                  "Learning about weather",
+                ],
+                correctAnswer: 1, // Playing video games is at index 1
+              },
+            ],
+          },
+          {
+            id: "10-2",
+            title: "The Community Garden Project",
+            text: `Alex had never been away from home for a whole week before. Now here she was, boarding the bus for science camp in the mountains.
+"You'll have a great time," her mom promised. "And you can call us every evening."
+At camp, Alex was assigned to Cabin Pine with four other kids. Their counsellor, Jessie, had bright blue hair and knew everything about stars.
+The first day was tough. Alex missed home and felt too shy to talk much. But on the second day, during the robotics workshop, she helped her team build a robot that could follow a line across the floor.
+"That was smart programming," said her cabinmate Theo. "Where did you learn to do that?"
+Soon Alex was enjoying the daily activities: building miniature volcanoes, tracking wildlife in the forest, and learning about weather patterns. At night, Jessie showed them constellations through a powerful telescope.
+By the end of the week, Alex had forgotten she was ever homesick. When her parents came to pick her up, she could not stop talking about all her adventures.
+"Can I come back next summer?" she asked.
+Her parents smiled. "Of course you can."
+`,
+            questions: [
+              {
+                question:
+                  "What was the original condition of the lot next to Lincoln Elementary?",
+                options: [
+                  "It was already a garden.",
+                  "It was full of wildflowers.",
+                  "It was used for sports.",
+                  "It was empty and full of trash.",
+                ],
+                correctAnswer: 3,
+              },
+              {
+                question: "What idea did Omar suggest in class?",
+                options: [
+                  "Building a new playground",
+                  "Turning the empty lot into a garden",
+                  "Starting a recycling program",
+                  "Making a mural on the school wall",
+                ],
+                correctAnswer: 1,
+              },
+              {
+                question: "What was the most difficult part of the project?",
+                options: [
+                  "Writing the proposal",
+                  "Finding seeds",
+                  "Building the garden beds",
+                  "Following the watering schedule",
+                ],
+                correctAnswer: 3,
+              },
+              {
+                question:
+                  "What did the students do with the money earned from the farmers’ market?",
+                options: [
+                  "Bought more seeds",
+                  "Donated it to the food bank",
+                  "Went on a field trip",
+                  "Bought snacks for the class",
+                ],
+                correctAnswer: 1,
+              },
+              {
+                question: "What was the name written on the garden sign?",
+                options: [
+                  "The Lincoln Garden Project",
+                  "The Green Team Garden",
+                  "Growing Together: Lincoln Elementary Community Garden",
+                  "Flowers and Veggies Forever",
+                ],
+                correctAnswer: 2,
+              },
+            ],
+          },
+          {
+            id: "10-3",
+            title: "The Treasure Map Challenge",
+            text: `Dani found an old map in his grandfather's attic. It was yellowed with age and had strange markings all over it.
+"What do you think this is?" Dani asked his grandfather.
+Grandpa adjusted his glasses and smiled. "That looks like a treasure map I made for your father when he was about your age."
+Dani's eyes widened. "A real treasure hunt? Does the treasure still exist?"
+"I suppose it might," Grandpa said with a twinkle in his eye. "If nobody has found it yet."
+The next day, Dani invited his friend Neha to help solve the map. They studied the faded symbols and tried to match them to landmarks in Grandpa's neighbourhood.
+"This tree with the mark must be the old oak at the park," Neha pointed out.
+They followed the map from the oak tree to the library, then to the community garden. At each spot, they found a small clue Grandpa had written many years ago.
+The final clue led them to a hollow tree stump behind the baseball field. Dani reached inside and pulled out a small metal box. Inside was a collection of beautiful rocks and minerals, along with a note: "Congratulations, treasure hunter! These specimens were collected from places all around the world."
+"Your dad never found this," Grandpa confirmed when they showed him. "He gave up too soon."
+Dani displayed the rock collection in his room, he felt proud to have completed the challenge his father never did.
+`,
+            questions: [
+              {
+                question: "Where did Dani find the treasure map?",
+                options: [
+                  "In his school backpack",
+                  "In the community library",
+                  "In his grandfather's attic",
+                  "In the garden",
+                ],
+                correctAnswer: 2,
+              },
+              {
+                question: "Who originally made the treasure map?",
+                options: [
+                  "Dani's mom",
+                  "Dani's grandfather",
+                  "Dani's teacher",
+                  "Dani's father’s friend",
+                ],
+                correctAnswer: 1,
+              },
+              {
+                question:
+                  "Who helped Dani solve the map and find the treasure?",
+                options: [
+                  "His grandfather",
+                  "His cousin",
+                  "His friend Neha",
+                  "His teacher",
+                ],
+                correctAnswer: 2,
+              },
+              {
+                question:
+                  "What was inside the metal box at the end of the treasure hunt?",
+                options: [
+                  "Coins and jewels",
+                  "Toys and candy",
+                  "A diary and a map",
+                  "Rocks, minerals, and a note",
+                ],
+                correctAnswer: 3,
+              },
+              {
+                question: "Why was Dani proud at the end of the story?",
+                options: [
+                  "He wrote his own treasure map.",
+                  "He completed a challenge his father never did.",
+                  "He found real gold.",
+                  "He shared the treasure with his class.",
+                ],
+                correctAnswer: 1,
+              },
+            ],
+          },
+        ],
+      };
+      // DOM Elements
+      const studentInfoSection = document.getElementById("student-info");
+      const studentName = document.getElementById("student-name");
+      const studentAge = document.getElementById("student-age");
+      const studentClass = document.getElementById("student-class");
+      const studentSchool = document.getElementById("student-school");
+      const studentCity = document.getElementById("student-city");
+      const submitInfoBtn = document.getElementById("submit-info");
+      const ageSelect = document.getElementById("age-select");
+      const passageSelect = document.getElementById("passage-select");
+      const ageSelector = document.querySelector(".age-selector");
+      const passageSelector = document.querySelector(".passage-selector");
+      const startReadingBtn = document.getElementById("start-reading");
+      const startTimeBtn = document.getElementById("start-time");
+      const readingArea = document.getElementById("reading-area");
+      const readingText = document.getElementById("reading-text");
+      const finishReadingBtn = document.getElementById("finish-reading");
+      const mcqArea = document.getElementById("mcq-area");
+      const mcqQuestions = document.getElementById("mcq-questions");
+      const studentFeedback = document.getElementById("feedback-select");
+      const submitAnswersBtn = document.getElementById("submit-answers");
+      const resultsArea = document.getElementById("results-area");
+      const readingSpeedEl = document.getElementById("reading-speed");
+      const accuracyEl = document.getElementById("accuracy");
+      const resultsContent = document.getElementById("results-content");
+      const tryAnotherBtn = document.getElementById("try-another");
+      const timerEl = document.getElementById("timer");
+      const adminTrigger = document.getElementById("admin-trigger");
+      const adminPanel = document.getElementById("admin-panel");
+      const exportDataBtn = document.getElementById("export-data");
+      const clearDataBtn = document.getElementById("clear-data"); // New button for clearing data
+      const dataPreview = document.getElementById("data-preview");
+
+      // Variables to track state
+      let selectedPassage = null;
+      let startTime = null;
+      let endTime = null;
+      let timerInterval = null;
+      let selectedAnswers = [];
+      let currentStudentData = null;
+      let studentDatabase = [];
+
+      // Load database from localStorage if exists
+      if (localStorage.getItem("studentReadingData")) {
+        try {
+          studentDatabase = JSON.parse(
+            localStorage.getItem("studentReadingData")
+          );
+        } catch (e) {
+          console.error("Error loading data from localStorage", e);
+          studentDatabase = [];
+        }
+      }
+
+      // Event Listeners
+      submitInfoBtn.addEventListener("click", handleStudentInfoSubmit);
+      ageSelect.addEventListener("change", handleAgeSelect);
+      passageSelect.addEventListener("change", handlePassageSelect);
+      startReadingBtn.addEventListener("click", startReading);
+      startTimeBtn.addEventListener("click", startTimer);
+      finishReadingBtn.addEventListener("click", finishReading);
+      submitAnswersBtn.addEventListener("click", submitAnswers);
+      tryAnotherBtn.addEventListener("click", resetApp);
+      adminTrigger.addEventListener("click", toggleAdminPanel);
+      exportDataBtn.addEventListener("click", exportToExcel);
+      clearDataBtn.addEventListener("click", clearAllData); // New event listener for clear data button
+
+      // Check sequence of clicks for admin panel
+      let adminClickSequence = [];
+      let lastClickTime = 0;
+
+      adminTrigger.addEventListener("click", function (e) {
+        const currentTime = new Date().getTime();
+
+        // Reset sequence if more than 2 seconds since last click
+        if (currentTime - lastClickTime > 2000) {
+          adminClickSequence = [];
+        }
+
+        // Add this click to sequence
+        adminClickSequence.push(currentTime);
+        lastClickTime = currentTime;
+
+        // Check if we have 3 quick clicks
+        if (adminClickSequence.length >= 3) {
+          toggleAdminPanel();
+          adminClickSequence = []; // Reset after triggering
+        }
+      });
+
+      // Handler Functions
+      function handleStudentInfoSubmit() {
+        // Validate all fields are filled
+        if (
+          !studentName.value ||
+          !studentAge.value ||
+          !studentClass.value ||
+          !studentSchool.value ||
+          !studentCity.value
+        ) {
+          alert("Please fill in all student information fields.");
+          return;
+        }
+
+        // Create student data object
+        currentStudentData = {
+          name: studentName.value,
+          age: studentAge.value,
+          class: studentClass.value,
+          school: studentSchool.value,
+          city: studentCity.value,
+          feedback: [],
+          tests: [],
+        };
+
+        // Save to database immediately
+        saveStudentData();
+
+        // Hide student info, show age selector
+        studentInfoSection.style.display = "none";
+        ageSelector.style.display = "block";
+
+        // Pre-select age based on student info
+        ageSelect.value = currentStudentData.age;
+        handleAgeSelect();
+      }
+
+      function handleAgeSelect() {
+        const age = ageSelect.value;
+        if (!age) return;
+
+        // Clear passage select options
+        passageSelect.innerHTML = '<option value="">Select a passage</option>';
+
+        // Add new options based on age
+        if (readingData[age]) {
+          readingData[age].forEach((passage) => {
+            const option = document.createElement("option");
+            option.value = passage.id;
+            option.textContent = passage.title;
+            passageSelect.appendChild(option);
+          });
+
+          passageSelector.style.display = "block";
+        }
+      }
+
+      function handlePassageSelect() {
+        const passageId = passageSelect.value;
+        if (!passageId) return;
+
+        // Find the selected passage
+        const [age, index] = passageId.split("-");
+        selectedPassage = readingData[age][index - 1];
+
+        // Enable start button
+        startReadingBtn.disabled = false;
+      }
+
+      function startReading() {
+        if (!selectedPassage) return;
+
+        // Hide selectors, show reading area
+        ageSelector.style.display = "none";
+        passageSelector.style.display = "none";
+        readingArea.style.display = "block";
+
+        // Display text
+        readingText.textContent = selectedPassage.text;
+      }
+
+      function startTimer() {
+        // Start timer
+        startTime = new Date();
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      function updateTimer() {
+        const now = new Date();
+        const elapsedSeconds = Math.floor((now - startTime) / 1000);
+        const minutes = Math.floor(elapsedSeconds / 60)
+          .toString()
+          .padStart(2, "0");
+        const seconds = (elapsedSeconds % 60).toString().padStart(2, "0");
+        timerEl.textContent = `${minutes}:${seconds}`;
+      }
+
+      function finishReading() {
+        // Stop timer
+        endTime = new Date();
+        clearInterval(timerInterval);
+
+        // Hide reading area, show MCQs
+        readingArea.style.display = "none";
+        mcqArea.style.display = "block";
+
+        // Load questions
+        loadQuestions();
+      }
+
+      function loadQuestions() {
+        mcqQuestions.innerHTML = "";
+        selectedAnswers = new Array(selectedPassage.questions.length).fill(-1);
+
+        selectedPassage.questions.forEach((q, questionIndex) => {
+          const questionDiv = document.createElement("div");
+          questionDiv.className = "mcq-question";
+          questionDiv.textContent = `${questionIndex + 1}. ${q.question}`;
+
+          const optionsDiv = document.createElement("div");
+          optionsDiv.className = "mcq-options";
+
+          q.options.forEach((option, optionIndex) => {
+            const optionDiv = document.createElement("div");
+            optionDiv.className = "option";
+            optionDiv.textContent = option;
+            optionDiv.dataset.questionIndex = questionIndex;
+            optionDiv.dataset.optionIndex = optionIndex;
+
+            optionDiv.addEventListener("click", function () {
+              // Remove selected class from all siblings
+              const allOptions = this.parentNode.querySelectorAll(".option");
+              allOptions.forEach((opt) => opt.classList.remove("selected"));
+
+              // Add selected class to this option
+              this.classList.add("selected");
+
+              // Save the answer
+              selectedAnswers[questionIndex] = optionIndex;
+            });
+
+            optionsDiv.appendChild(optionDiv);
+          });
+
+          questionDiv.appendChild(optionsDiv);
+          mcqQuestions.appendChild(questionDiv);
+        });
+      }
+
+      function submitAnswers() {
+        // Calculate score
+        let correctAnswers = 0;
+        const totalQuestions = selectedPassage.questions.length;
+
+        selectedPassage.questions.forEach((q, index) => {
+          if (selectedAnswers[index] === q.correctAnswer) {
+            correctAnswers++;
+          }
+        });
+
+        // This calculation remains but is not displayed on the results page
+        const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
+
+        // This calculation remains but is not displayed on the results page
+        const wordCount = selectedPassage.text.split(" ").length;
+        const readingTimeMinutes = (endTime - startTime) / (1000 * 60);
+        const wpm = Math.round(wordCount / readingTimeMinutes);
+
+        // Save test results to the database object
+        // The "readingSpeed" and "accuracy" are the "columns" you wanted
+        const testResult = {
+          passageTitle: selectedPassage.title,
+          passageId: selectedPassage.id,
+          readingSpeed: wpm,
+          accuracy: accuracy,
+          date: new Date().toISOString().split("T")[0],
+        };
+
+        // Add to current student data
+        currentStudentData.tests.push(testResult);
+
+        //Saving feedback
+        if (!studentFeedback.value) {
+          alert("Please provide your feedback before submitting.");
+          return;
+        }
+
+        // Add to current student data
+        currentStudentData.feedback.push(studentFeedback.value);
+
+        // Update in database
+        updateStudentData();
+
+        // Display results page
+        mcqArea.style.display = "none";
+        resultsArea.style.display = "block";
+
+        // MODIFICATION START: The lines that updated the text for speed/accuracy are removed
+        // readingSpeedEl.textContent = wpm;
+        // accuracyEl.textContent = accuracy;
+        // MODIFICATION END
+
+        // Build results content (without speed and accuracy)
+        let resultsHTML = "";
+
+        if (accuracy >= 80) {
+          resultsHTML +=
+            "<p>Excellent job! You understood the passage very well!</p>";
+        } else if (accuracy >= 60) {
+          resultsHTML +=
+            "<p>Good work! Keep practicing to improve your comprehension.</p>";
+        } else {
+          resultsHTML +=
+            "<p>Nice try! Let's practice more to better understand what we read.</p>";
+        }
+
+        // Add question review
+        resultsHTML += "<h3>Review Your Answers:</h3>";
+        resultsHTML += '<div class="question-review">';
+
+        selectedPassage.questions.forEach((q, index) => {
+          const isCorrect = selectedAnswers[index] === q.correctAnswer;
+          resultsHTML += `<p class="${isCorrect ? "correct" : "incorrect"}">
+                                ${index + 1}. ${q.question}<br>
+                                ${
+                                  isCorrect
+                                    ? "✓ Correct!"
+                                    : "✗ Oops! The correct answer was: " +
+                                      q.options[q.correctAnswer]
+                                }
+                            </p>`;
+        });
+
+        resultsHTML += "</div>";
+
+        resultsContent.innerHTML = resultsHTML;
+      }
+
+      function resetApp() {
+        // Reset but keep student info
+        resultsArea.style.display = "none";
+        ageSelector.style.display = "block";
+        selectedPassage = null;
+        startTime = null;
+        endTime = null;
+        selectedAnswers = [];
+
+        // Clear timer
+        clearInterval(timerInterval);
+        timerEl.textContent = "00:00";
+
+        // Set age select to match student age
+        ageSelect.value = currentStudentData.age;
+        handleAgeSelect();
+      }
+
+      function saveStudentData() {
+        // Check if student already exists in database by name and school
+        const existingIndex = studentDatabase.findIndex(
+          (student) =>
+            student.name === currentStudentData.name &&
+            student.school === currentStudentData.school
+        );
+
+        if (existingIndex !== -1) {
+          // Update existing record
+          studentDatabase[existingIndex] = currentStudentData;
+        } else {
+          // Add new record
+          studentDatabase.push(currentStudentData);
+        }
+
+        // Save to localStorage
+        localStorage.setItem(
+          "studentReadingData",
+          JSON.stringify(studentDatabase)
+        );
+      }
+
+      function updateStudentData() {
+        // Find current student in database
+        const index = studentDatabase.findIndex(
+          (student) =>
+            student.name === currentStudentData.name &&
+            student.school === currentStudentData.school
+        );
+
+        if (index !== -1) {
+          studentDatabase[index] = currentStudentData;
+          localStorage.setItem(
+            "studentReadingData",
+            JSON.stringify(studentDatabase)
+          );
+        }
+      }
+
+      function toggleAdminPanel() {
+        if (adminPanel.style.display === "block") {
+          adminPanel.style.display = "none";
+        } else {
+          // Show password prompt
+          const password = prompt("Enter admin password:");
+          if (password === "admin123") {
+            // Simple password for demo
+            adminPanel.style.display = "block";
+            renderDataPreview();
+          }
+        }
+      }
+
+      function renderDataPreview() {
+        if (studentDatabase.length === 0) {
+          dataPreview.innerHTML = "<p>No student data available.</p>";
+          return;
+        }
+
+        let tableHTML =
+          '<table border="1" style="width:100%; border-collapse: collapse;">';
+
+        // Headers
+        tableHTML +=
+          "<tr><th>Name</th><th>Age</th><th>Class</th><th>School</th><th>City</th><th>Feedback</th><th>Tests</th></tr>";
+
+        // Data rows
+        studentDatabase.forEach((student) => {
+          tableHTML += `<tr>
+                                <td>${student.name}</td>
+                                <td>${student.age}</td>
+                                <td>${student.class}</td>
+                                <td>${student.school}</td>
+                                <td>${student.city}</td>
+                                <td>${student.feedback}</td>
+                                <td>${student.tests.length} test(s)</td>
+                            </tr>`;
+        });
+
+        tableHTML += "</table>";
+        dataPreview.innerHTML = tableHTML;
+      }
+
+      function exportToExcel() {
+        if (studentDatabase.length === 0) {
+          alert("No data to export.");
+          return;
+        }
+
+        // Create flattened data for CSV
+        const flatData = [];
+
+        studentDatabase.forEach((student) => {
+          if (student.tests.length === 0) {
+            // Student with no tests
+            flatData.push({
+              "Student Name": student.name,
+              Age: student.age,
+              Class: student.class,
+              School: student.school,
+              City: student.city,
+              Feedback: student.feedback,
+              "Passage Title": "",
+              "Reading Speed (WPM)": "",
+              "Accuracy (%)": "",
+              "Test Date": "",
+            });
+          } else {
+            // Student with tests
+            student.tests.forEach((test) => {
+              flatData.push({
+                "Student Name": student.name,
+                Age: student.age,
+                Class: student.class,
+                School: student.school,
+                City: student.city,
+                Feedback: student.feedback,
+                "Passage Title": test.passageTitle,
+                "Reading Speed (WPM)": test.readingSpeed,
+                "Accuracy (%)": test.accuracy,
+                "Test Date": test.date,
+              });
+            });
+          }
+        });
+
+        // Convert to CSV
+        const headers = Object.keys(flatData[0]);
+        let csvContent = headers.join(",") + "\n";
+
+        flatData.forEach((row) => {
+          const values = headers.map((header) => {
+            const val = row[header];
+            // Escape quotes and wrap values with commas in quotes
+            const escaped = String(val).replace(/"/g, '""');
+            return `"${escaped}"`;
+          });
+          csvContent += values.join(",") + "\n";
+        });
+
+        // Create download
+        const blob = new Blob([csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute("href", url);
+        link.setAttribute("download", "reading_tracker_data.csv");
+        link.style.visibility = "hidden";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // New function to clear all data
+      function clearAllData() {
+        if (studentDatabase.length === 0) {
+          alert("No data to clear.");
+          return;
+        }
+
+        const confirmed = confirm(
+          "Are you sure you want to clear all student data? This action cannot be undone."
+        );
+        if (confirmed) {
+          // Clear the database array
+          studentDatabase = [];
+
+          // Clear localStorage
+          localStorage.removeItem("studentReadingData");
+
+          // Update the UI
+          renderDataPreview();
+
+          alert("All student data has been cleared successfully.");
+        }
+      }
+
+      // Check if returning visitor needs to enter info again
+      window.onload = function () {
+        //adminTrigger.innerText = ""; // Hide admin text
+
+        // Always show student info form on page load
+        studentInfoSection.style.display = "block";
+        ageSelector.style.display = "none";
+        passageSelector.style.display = "none";
+        readingArea.style.display = "none";
+        mcqArea.style.display = "none";
+        resultsArea.style.display = "none";
+        adminPanel.style.display = "none";
+      };
+    </script>
+  </body>
+</html>
