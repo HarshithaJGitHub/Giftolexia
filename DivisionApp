@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learn Math The Fun Way - Division</title>
+    <style>
+      /* Basic body styles */
+      body {
+        margin: 0;
+        background-color: #f8f9fa;
+      }
+      /* A universal rule for more predictable layouts */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* --- DEFAULT STYLES (LAPTOP VIEW) --- */
+      /* These styles apply to screens wider than 900px */
+
+      .app-container {
+        font-family: serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+      }
+
+      .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .header-logo img {
+        width: 120px;
+        height: 100px;
+        object-fit: contain;
+      }
+
+      .header-center {
+        text-align: center;
+        flex: 1;
+        padding: 0 20px;
+      }
+
+      .header-title {
+        color: black;
+        font-size: 34px;
+        margin: 0 0 10px 0;
+        font-family: serif;
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+      }
+
+      .progress-bar {
+        flex: 1;
+        height: 10px;
+        background-color: white;
+        border: 2px solid black;
+        border-radius: 5px;
+        max-width: 400px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background-color: grey;
+        border-radius: 5px;
+        transition: width 0.5s ease-in-out;
+      }
+
+      .score-text {
+        color: black;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: serif;
+      }
+
+      .timer {
+        width: 80px;
+        text-align: right;
+        color: black;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .main-content {
+        display: flex;
+        border: 2px solid black;
+        border-radius: 10px;
+        overflow: hidden;
+        min-height: 450px;
+      }
+
+      .level-panel {
+        width: 300px;
+        border-right: 2px solid black;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .level-button {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid black;
+        color: black;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.3s ease;
+        display: flex;
+        font-family: serif;
+        font-size: 24px;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .question-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+        text-align: center;
+      }
+
+      .question-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px 0;
+        font-family: serif;
+        color: #555;
+        font-size: 20px;
+      }
+
+      /* This is hidden on desktop by default */
+      .header-top-row {
+        display: none;
+      }
+
+      /* --- RESPONSIVE STYLES (MOBILE VIEW) --- */
+      /* These styles apply when the screen is 900px wide or less */
+
+      @media (max-width: 900px) {
+        .header-container {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        /* Create a new flex container for the top row (logo & timer) */
+        .header-top-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        /* Hide the original logo and timer meant for desktop */
+        .header-container > .header-logo,
+        .header-container > .timer {
+          display: none;
+        }
+
+        /* The center content now becomes the bottom row */
+        .header-center {
+          padding: 0;
+          width: 100%;
+        }
+
+        /* Main content stacks vertically */
+        .main-content {
+          flex-direction: column;
+        }
+
+        .level-panel {
+          width: 100%;
+          border-right: none;
+          border-bottom: 2px solid black;
+          padding: 20px;
+        }
+
+        .question-panel {
+          padding: 20px;
+          min-height: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Load React from CDN -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+
+    <!-- Load Babel for JSX support -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Your React Component -->
+    <script type="text/babel">
+      const DivisionLearningApp = () => {
+        const [selectedLevel, setSelectedLevel] = React.useState(null);
+        const [gameMode, setGameMode] = React.useState("Numerical");
+        const [score, setScore] = React.useState(0);
+        const [currentQuestion, setCurrentQuestion] = React.useState(null);
+        const [userAnswer, setUserAnswer] = React.useState("");
+        const [feedback, setFeedback] = React.useState("");
+        const [isCorrect, setIsCorrect] = React.useState(null);
+        const [time, setTime] = React.useState(0);
+
+        React.useEffect(() => {
+          const timerId = setInterval(() => {
+            setTime((prevTime) => prevTime + 1);
+          }, 1000);
+          return () => clearInterval(timerId);
+        }, []);
+
+        const formatTime = (totalSeconds) => {
+          const minutes = Math.floor(totalSeconds / 60)
+            .toString()
+            .padStart(2, "0");
+          const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+          return `${minutes}:${seconds}`;
+        };
+
+        const appreciationMessages = [
+          "Great job! 🎉",
+          "Well done!",
+          "You're becoming a math master!",
+          "Fantastic work!",
+          "Keep it up!",
+        ];
+
+        const levels = [
+          { id: 1, label: "Level 1", description: "Basic Division" },
+          { id: 2, label: "Level 2", description: "Intermediate Division" },
+          { id: 3, label: "Level 3", description: "Advanced Division" },
+        ];
+
+        const generateQuestion = React.useCallback((level, gameMode) => {
+          const generateOperands = (level) => {
+            let a1, a2, quotient;
+            switch (level) {
+              case 1:
+                a2 = Math.floor(Math.random() * 9) + 2;
+                quotient = Math.floor(Math.random() * 10) + 1;
+                a1 = a2 * quotient;
+                break;
+              case 2:
+                do {
+                  a2 = Math.floor(Math.random() * 23) + 3;
+                  quotient = Math.floor(Math.random() * 108) + 3;
+                  a1 = a2 * quotient;
+                } while (a1 >= 250);
+                break;
+              case 3:
+                a2 = Math.floor(Math.random() * 226) + 25;
+                a1 = Math.floor(Math.random() * (961 - a2 * 2)) + (40 + a2 * 2);
+                quotient = a1 / a2;
+                break;
+              default:
+                a1 = 30;
+                a2 = 2;
+                quotient = 15;
+            }
+            return { a1, a2, quotient };
+          };
+
+          const wordProblemGenerators = {
+            1: () => {
+              const { a1, a2, quotient } = generateOperands(1);
+              const templates = [
+                `Priya has ${a1} chocolates and wants to distribute them equally among ${a2} friends. How many chocolates will each friend receive?`,
+                `A farmer has ${a1} eggs and wants to pack them into boxes of ${a2} eggs each. How many complete boxes can he make?`,
+                `Rahul has ${a1} stickers and wants to give an equal number to ${a2} of his classmates. How many stickers will each classmate get?`,
+                `${a1} candies need to be shared equally among ${a2} children. How many candies will each child receive?`,
+                `A library has ${a1} books that need to be distributed equally among ${a2} reading groups. How many books will each group get?`,
+                `A teacher has ${a1} pencils and wants to distribute them equally among ${a2} students. How many pencils will each student receive?`,
+                `A fruit seller has ${a1} oranges and wants to pack them into bags containing ${a2} oranges each. How many full bags can be prepared?`,
+              ];
+              return {
+                question:
+                  templates[Math.floor(Math.random() * templates.length)],
+                correctAnswer: `${quotient}`,
+              };
+            },
+            2: () => {
+              const { a1, a2, quotient } = generateOperands(2);
+              const templates = [
+                `A factory produces ${a1} toys and wants to pack them into boxes of ${a2} toys each. How many complete boxes can they make?`,
+                `${a1} students are to be divided into ${a2} equal classes. How many students will be in each class?`,
+                `A bakery has ${a1} cupcakes and wants to distribute them equally among ${a2} shops. How many cupcakes will each shop receive?`,
+                `${a1} rupees need to be divided equally among ${a2} people. How much money will each person get?`,
+                `A library has ${a1} books to be distributed equally among ${a2} reading clubs. How many books will each club receive?`,
+                `A school cafe has prepared ${a1} plates of snacks and needs to distribute them equally among ${a2} tables. How many plates will each table get?`,
+                `A gardener has ${a1} seeds and wants to plant them equally in ${a2} rows. How many seeds will go into each row?`,
+              ];
+              return {
+                question:
+                  templates[Math.floor(Math.random() * templates.length)],
+                correctAnswer: `${quotient}`,
+              };
+            },
+            3: () => {
+              const { a1, a2, quotient } = generateOperands(3);
+              const templates = [
+                `A factory produces ${a1} toys and wants to pack them into boxes of ${a2} toys each. How many complete boxes can they make?`,
+                `${a1} students are to be divided into ${a2} equal classes. How many students will be in each class?`,
+                `A bakery has ${a1} cupcakes and wants to distribute them equally among ${a2} shops. How many cupcakes will each shop receive?`,
+                `${a1} rupees need to be divided equally among ${a2} people. How much money will each person get?`,
+                `A library has ${a1} books to be distributed equally among ${a2} reading clubs. How many books will each club receive?`,
+                `A school cafe has prepared ${a1} plates of snacks and needs to distribute them equally among ${a2} tables. How many plates will each table get?`,
+                `A gardener has ${a1} seeds and wants to plant them equally in ${a2} rows. How many seeds will go into each row?`,
+              ];
+              return {
+                question:
+                  templates[Math.floor(Math.random() * templates.length)],
+                correctAnswer: `${quotient.toFixed(2)}`,
+              };
+            },
+          };
+
+          const numericalProblemGenerators = {
+            1: () => {
+              const { a1, a2, quotient } = generateOperands(1);
+              return {
+                question: `${a1} ÷ ${a2} = ?`,
+                correctAnswer: `${quotient}`,
+              };
+            },
+            2: () => {
+              const { a1, a2, quotient } = generateOperands(2);
+              return {
+                question: `${a1} ÷ ${a2} = ?`,
+                correctAnswer: `${quotient}`,
+              };
+            },
+            3: () => {
+              const { a1, a2, quotient } = generateOperands(3);
+              return {
+                question: `${a1} ÷ ${a2} = ?`,
+                correctAnswer: `${quotient.toFixed(2)}`,
+              };
+            },
+          };
+
+          const generator =
+            gameMode === "Word Problems"
+              ? wordProblemGenerators[level]
+              : numericalProblemGenerators[level];
+          return generator ? generator() : null;
+        }, []);
+
+        const handleLevelSelect = (level) => {
+          setSelectedLevel(level);
+          setCurrentQuestion(generateQuestion(level, gameMode));
+          setFeedback("");
+          setIsCorrect(null);
+          setUserAnswer("");
+        };
+
+        const handleAnswerSubmit = () => {
+          if (!currentQuestion) return;
+          const normalizedAnswer = userAnswer.trim();
+          const isAnswerCorrect =
+            selectedLevel === 3
+              ? Math.abs(
+                  parseFloat(normalizedAnswer) -
+                    parseFloat(currentQuestion.correctAnswer)
+                ) <= 0.1
+              : normalizedAnswer === currentQuestion.correctAnswer;
+          if (isAnswerCorrect) {
+            setScore(score + 10);
+            setFeedback(
+              appreciationMessages[
+                Math.floor(Math.random() * appreciationMessages.length)
+              ]
+            );
+            setIsCorrect(true);
+            setTimeout(() => {
+              setCurrentQuestion(generateQuestion(selectedLevel, gameMode));
+              setUserAnswer("");
+              setFeedback("");
+              setIsCorrect(null);
+            }, 1500);
+          } else {
+            setFeedback(
+              `Not quite! The correct answer is ${currentQuestion.correctAnswer}`
+            );
+            setIsCorrect(false);
+            setTimeout(() => {
+              setCurrentQuestion(generateQuestion(selectedLevel, gameMode));
+              setUserAnswer("");
+              setFeedback("");
+              setIsCorrect(null);
+            }, 2500);
+          }
+        };
+
+        return (
+          <div className="app-container">
+            {/* Header Section */}
+            <div className="header-container">
+              {/* This div is for structuring the mobile view */}
+              <div className="header-top-row">
+                <div className="header-logo">
+                  {/* Using a placeholder logo URL for compatibility */}
+                  <img src="logo.png" alt="Math App Logo" />
+                </div>
+                <div className="timer">{formatTime(time)}</div>
+              </div>
+
+              {/* This logo is for the desktop view */}
+              <div className="header-logo">
+                <img src="logo.png" alt="Math App Logo" />
+              </div>
+
+              <div className="header-center">
+                <h1 className="header-title">
+                  Learn Math The Fun Way - Division
+                </h1>
+                <div className="progress-container">
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${Math.min(score / 10, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-text">Score: {score}</div>
+                </div>
+              </div>
+              {/* This timer is for the desktop view */}
+              <div className="timer">{formatTime(time)}</div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="main-content">
+              {/* Level Selection Section */}
+              <div className="level-panel">
+                {levels.map((level) => (
+                  <button
+                    key={level.id}
+                    onClick={() => handleLevelSelect(level.id)}
+                    className="level-button"
+                    style={{
+                      backgroundColor:
+                        selectedLevel === level.id ? "grey" : "white",
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold" }}>{level.label}</div>
+                    <div style={{ fontSize: "18px", marginTop: "5px" }}>
+                      {level.description}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Main Question Area */}
+              <div className="question-panel">
+                <div className="question-area">
+                  {!selectedLevel ? (
+                    <h2 style={{ fontSize: "28px" }}>
+                      Choose a level to start!
+                    </h2>
+                  ) : currentQuestion ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100%",
+                        maxWidth: "500px",
+                      }}
+                    >
+                      <div style={{ fontSize: "26px", marginBottom: "30px" }}>
+                        {currentQuestion.question}
+                      </div>
+                      <input
+                        type="text"
+                        value={userAnswer}
+                        onChange={(e) => {
+                          if (/^[0-9.\s]*$/.test(e.target.value)) {
+                            setUserAnswer(e.target.value);
+                          }
+                        }}
+                        placeholder="Enter your answer"
+                        style={{
+                          width: "250px",
+                          padding: "12px",
+                          fontSize: "20px",
+                          border: `2px solid ${
+                            isCorrect === null
+                              ? "black"
+                              : isCorrect
+                              ? "green"
+                              : "red"
+                          }`,
+                          borderRadius: "8px",
+                          marginBottom: "20px",
+                          textAlign: "center",
+                        }}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" && handleAnswerSubmit()
+                        }
+                      />
+                      <button
+                        onClick={handleAnswerSubmit}
+                        style={{
+                          padding: "12px 24px",
+                          backgroundColor: "white",
+                          color: "black",
+                          border: "2px solid black",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                          marginBottom: "20px",
+                        }}
+                      >
+                        Submit Answer
+                      </button>
+                      {feedback && (
+                        <div
+                          style={{
+                            color: isCorrect ? "green" : "red",
+                            fontWeight: "bold",
+                            fontSize: "18px",
+                          }}
+                        >
+                          {feedback}
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "20px",
+                  }}
+                >
+                  {["Numerical", "Word Problems"].map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        if (gameMode !== mode) {
+                          setGameMode(mode);
+                          if (selectedLevel) {
+                            setCurrentQuestion(
+                              generateQuestion(selectedLevel, mode)
+                            );
+                          }
+                        }
+                      }}
+                      style={{
+                        padding: "10px 20px",
+                        border: "2px solid black",
+                        backgroundColor: gameMode === mode ? "grey" : "white",
+                        color: "black",
+                        borderRadius: "8px",
+                        fontFamily: "serif",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                      }}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <footer className="footer">@Giftolexia</footer>
+          </div>
+        );
+      };
+      // Render the app
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<DivisionLearningApp />);
+    </script>
+  </body>
+</html>
